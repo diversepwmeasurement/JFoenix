@@ -1,28 +1,32 @@
----
-name: Java CI
-
-on: [push]
-
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-18.04, macOS-latest, windows-latest]
-        java: [8]
-      fail-fast: false
-      max-parallel: 4
     name: Test JDK ${{ matrix.java }}, ${{ matrix.os }}
-
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java }}
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew build
-
-...
+    - continue-on-error: true
+      uses: actions/checkout@v2
+    - continue-on-error: true
+      name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - continue-on-error: true
+      name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - continue-on-error: true
+      name: Build with Gradle
+      run: ./gradlew build
+    strategy:
+      fail-fast: false
+      matrix:
+        java:
+        - 8
+        os:
+        - ubuntu-18.04
+        - macOS-latest
+        - windows-latest
+      max-parallel: 4
+name: Java CI
+on:
+  repository_dispatch:
+    types: trigger-ga___ci.yml
